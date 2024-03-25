@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/mitchellh/mapstructure"
 )
 
 func InsertDataDynamic(ctx context.Context, data map[string]interface{}) (map[string]interface{}, error) {
@@ -99,6 +100,7 @@ func InsertDataDynamic(ctx context.Context, data map[string]interface{}) (map[st
 
 		// fmt.Println(dataSlice)
 		for i := 0; i < len(dataSlice); i++ {
+
 			element := dataSlice[i].(map[string]interface{})
 			// fmt.Println(element["id"])
 			temp, err := db.DB.Raw(fmt.Sprintf("SELECT %s FROM %s WHERE id = %v", param, tablenames, element["id"])).Rows()
@@ -158,11 +160,52 @@ func InsertDataDynamic(ctx context.Context, data map[string]interface{}) (map[st
 						idData := dataSlice[i].(map[string]interface{})["id"]
 						insertedIds[tablenames] = append(insertedIds[tablenames], idData)
 
+						structValuePtr := reflect.ValueOf(tempStruct)
+						if structValuePtr.Kind() != reflect.Ptr || structValuePtr.Elem().Kind() != reflect.Struct {
+							return nil, fmt.Errorf("tempStruct is not a pointer to a struct")
+						}
+
+						// Dereference the pointer to get the struct value
+						structValue := structValuePtr.Elem()
+
+						dataMap := dataSlice[i].(map[string]interface{})
+						err := mapstructure.Decode(dataMap, structValue.Addr().Interface())
+						if err != nil {
+							return nil, err
+						}
+
+						// Validate the tempStruct
+						err = ValidateStructInstance(tempStruct)
+						if err != nil {
+							return nil, err
+						}
+
 						delete(dataSlice[i].(map[string]interface{}), "id")
 						db.DB.Model(tempStruct).Where("id = ?", id).Updates(dataSlice[i].(map[string]interface{}))
 					}
 				}
 			} else {
+
+				structValuePtr := reflect.ValueOf(tempStruct)
+				if structValuePtr.Kind() != reflect.Ptr || structValuePtr.Elem().Kind() != reflect.Struct {
+					return nil, fmt.Errorf("tempStruct is not a pointer to a struct")
+				}
+
+				// Dereference the pointer to get the struct value
+				structValue := structValuePtr.Elem()
+
+				dataMap := dataSlice[i].(map[string]interface{})
+				err := mapstructure.Decode(dataMap, structValue.Addr().Interface())
+				if err != nil {
+					return nil, err
+				}
+
+				// Validate the tempStruct
+				err = ValidateStructInstance(tempStruct)
+				if err != nil {
+					return nil, err
+				}
+
 				db.DB.Model(tempStruct).Create(dataSlice[i].(map[string]interface{}))
 				idData := dataSlice[i].(map[string]interface{})["id"]
 				insertedIds[tablenames] = append(insertedIds[tablenames], idData)

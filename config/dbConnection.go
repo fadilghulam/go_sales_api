@@ -65,15 +65,23 @@ func GenerateStruct(db *gorm.DB) *gorm.DB {
 	if err != nil {
 		fmt.Println(err)
 	}
-	// fmt.Println(mydir)
 
 	g := gen.NewGenerator(gen.Config{
 		OutPath: mydir + "/internal/generated",
 		// OutPath: "../golang-api/internal/generated",
-		Mode: gen.WithoutContext | gen.WithDefaultQuery | gen.WithQueryInterface, // generate mode
+		Mode: gen.WithoutContext | gen.WithDefaultQuery | gen.WithQueryInterface,
 	})
 
 	g.UseDB(db)
+
+	// g.ApplyBasic(
+	// 	// Generate struct `User` based on table `users`
+	// 	g.GenerateModel("users"),
+
+	// 	// Generate struct `Employee` based on table `users`
+	//    g.GenerateModelAs("users", "Employee"),
+
+	// )
 
 	g.ApplyBasic(
 		g.GenerateAllTable()...,
