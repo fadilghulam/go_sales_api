@@ -2,8 +2,7 @@ package model
 
 import (
 	"time"
-
-	validation "github.com/go-ozzo/ozzo-validation"
+	// validation "github.com/go-ozzo/ozzo-validation"
 )
 
 const TableNameCategory = "categories"
@@ -21,10 +20,10 @@ func (*Categories) TableName() string {
 	return TableNameCategory
 }
 
-func (a Categories) Validate() error {
-	return validation.ValidateStruct(&a,
-		validation.Field(&a.ID, validation.Required),
-		// Name cannot be empty, and the length must between 5 and 50
-		validation.Field(&a.Name, validation.Required, validation.Length(5, 50)),
-	)
-}
+// func (a Categories) Validate() error {
+// 	return validation.ValidateStruct(&a,
+// 		validation.Field(&a.ID, validation.Required),
+// 		// Name cannot be empty, and the length must between 5 and 50
+// 		validation.Field(&a.Name, validation.Required, validation.Length(5, 50)),
+// 	)
+// }

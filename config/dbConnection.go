@@ -50,7 +50,7 @@ func Connect() {
 	DB = db
 	fmt.Println("db conncted successfully")
 
-	// go GenerateStruct(db)
+	go GenerateStruct(db)
 
 	// AutoMigrate(db)
 	//if err := DB.AutoMigrate(&models.Cashier{}, &models.Category{}, &models.Payment{}, &models.PaymentType{}, &models.Product{}, &models.Discount{}, &models.Order{}).Error; err != nil {
@@ -74,18 +74,18 @@ func GenerateStruct(db *gorm.DB) *gorm.DB {
 
 	g.UseDB(db)
 
-	// g.ApplyBasic(
-	// 	// Generate struct `User` based on table `users`
-	// 	g.GenerateModel("users"),
+	g.ApplyBasic(
+		// Generate struct `User` based on table `users`
+		g.GenerateModel("ts.users"),
 
 	// 	// Generate struct `Employee` based on table `users`
 	//    g.GenerateModelAs("users", "Employee"),
 
-	// )
-
-	g.ApplyBasic(
-		g.GenerateAllTable()...,
 	)
+
+	// g.ApplyBasic(
+	// 	g.GenerateAllTable()...,
+	// )
 
 	g.Execute()
 
